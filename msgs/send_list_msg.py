@@ -41,7 +41,6 @@ def list_intent():
             }
         }
     })
-
     return payload
 
 def welcome_message(language):
@@ -84,7 +83,6 @@ def job_role_list():
             }
         }
     })
-
     return payload
 
 def payout_options_list():
@@ -130,7 +128,6 @@ def payout_options_list():
             }
         }
     })
-
     return payload
 
 def account_holder_name_prompt():
@@ -146,10 +143,9 @@ def account_holder_name_prompt():
             "body": "Please provide the following details:\n\n1. Account Holder Name\n2. Account Number\n3. IFSC Code"
         }
     })
-
     return payload
 
-def send_text_message(to, text_msg_content):
+def send_text_message(to, text):
     payload = json.dumps({
         "messaging_product": "whatsapp",
         "recipient_type": "individual",
@@ -157,12 +153,12 @@ def send_text_message(to, text_msg_content):
         "type": "text",
         "text": {
             "preview_url": False,
-            "body": text_msg_content
+            "body": text
         }
     })
     return payload
 
-def receive(message_id, text_msg_content):
+def receive(message_id, text_message_content):
     payload = json.dumps({
         "messaging_product": "whatsapp",
         "recipient_type": "individual",
@@ -173,7 +169,7 @@ def receive(message_id, text_msg_content):
         "type": "text",
         "text": {
             "preview_url": False,
-            "body": text_msg_content
+            "body": text_message_content
         }
     })
     return payload
