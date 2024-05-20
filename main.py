@@ -2,7 +2,7 @@ import os
 from flask import Flask, request, json
 import requests
 from dotenv import load_dotenv
-from msgs.send_list_msg import list_intent, welcome_message, job_role_list, payout_options_list, account_holder_name_prompt
+from msgs.send_list_msg import list_intent, welcome_message, job_role_list, payout_options_list, account_holder_name_prompt, receive_input
 load_dotenv()
 
 app = Flask(__name__)
@@ -85,38 +85,13 @@ def handle_webhook():
 
             try:
                 job_role_selected = request.json["entry"][0]["changes"][0]["value"]["messages"][0]["interactive"]["button_reply"]["title"]
-                prompt_text = f"You have selected {job_role_selected}. Please type anything to continue."
-                prompt_data = json.dumps({
-                    "messaging_product": "whatsapp",
-                    "preview_url": False,
-                    "recipient_type": "individual",
-                    "to": from_number,
-                    "type": "text",
-                    "text": {
-                        "body": prompt_text
-                    }
-                })
-                prompt_resp = requests.post(url, headers=headers, data=prompt_data)
-                print(prompt_resp.text)
-                print("response code for user input prompt:" + str(prompt_resp.status_code))
-
-                # Assuming the next message from the user is "Thank you"
-                if request.json["entry"][0]["changes"][0]["value"]["messages"][0]["text"]["body"].lower() == "thank you":
-                    # Send a response after receiving "Thank you" message
-                    thank_you_msg = "You're welcome! If you need any further assistance, feel free to ask."
-                    thank_you_data = json.dumps({
-                        "messaging_product": "whatsapp",
-                        "preview_url": False,
-                        "recipient_type": "individual",
-                        "to": from_number,
-                        "type": "text",
-                        "text": {
-                            "body": thank_you_msg
-                        }
-                    })
-                    thank_you_resp = requests.post(url, headers=headers, data=thank_you_data)
-                    print(thank_you_resp.text)
-                    print("response code for thank you message:" + str(thank_you_resp.status_code))
+                if job_role_selected:
+                    # Prompt the user to type anything
+                    prompt_text = f"You have selected {job_role_selected}. Please type anything to continue."
+                    prompt_payload = receive_input(from_number, "<MSGID_OF_PREV_MSG>", prompt_text)
+                    prompt_resp = requests.post(url, headers=headers, data=prompt_payload)
+                    print(prompt_resp.text)
+                    print("response code for user input prompt:" + str(prompt_resp.status_code))
             except:
                 pass
 
