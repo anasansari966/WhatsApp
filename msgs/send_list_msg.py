@@ -61,39 +61,27 @@ def job_role_list():
         "messaging_product": "whatsapp",
         "recipient_type": "individual",
         "to": "919667623696",
-        "context": {
-            "message_id": "<MSGID_OF_PREV_MSG>"
-        },
         "type": "interactive",
         "interactive": {
-            "type": "list",
-            "header": {
-                "type": "text",
+            "type": "button",
+            "body": {
                 "text": "Please Select Your Job Role"
             },
-            "body": {
-                "text": "Select your job role from the options below"
-            },
-            "footer": {
-                "text": ""
-            },
             "action": {
-                "button": "job_role",
-                "sections": [
+                "buttons": [
                     {
-                        "title": "Job Roles",
-                        "rows": [
-                            {
-                                "id": "distributor",
-                                "title": "Distributor",
-                                "description": None
-                            },
-                            {
-                                "id": "supervisor_tl",
-                                "title": "Supervisor/TL",
-                                "description": None
-                            }
-                        ]
+                        "type": "reply",
+                        "reply": {
+                            "id": "distributor",
+                            "title": "Distributor"
+                        }
+                    },
+                    {
+                        "type": "reply",
+                        "reply": {
+                            "id": "supervisor_tl",
+                            "title": "Supervisor/TL"
+                        }
                     }
                 ]
             }
