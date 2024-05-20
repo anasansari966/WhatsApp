@@ -10,7 +10,7 @@ app = Flask(__name__)
 token = os.getenv('TOKEN')
 mytoken = os.getenv('MYTOKEN')
 
-user_name='User'
+user_name = 'User'
 
 @app.route("/webhook", methods=["GET"])
 def webhook_verification():
@@ -84,12 +84,21 @@ def handle_webhook():
                 pass
 
             try:
-                job_role_selected = request.json["entry"][0]["changes"][0]["value"]["messages"][0]["interactive"]["list_reply"]["title"]
-                if job_role_selected.lower() == "supervisor/tl":
-                    payout_options_data = payout_options_list()
-                    resp3 = requests.post(url, headers=headers, data=payout_options_data)
-                    print(resp3.text)
-                    print("response code for payout options list:" + str(resp3.status_code))
+                job_role_selected = request.json["entry"][0]["changes"][0]["value"]["messages"][0]["interactive"]["button_reply"]["title"]
+                prompt_text = f"You have selected {job_role_selected}. Please type anything to continue."
+                prompt_data = json.dumps({
+                    "messaging_product": "whatsapp",
+                    "preview_url": False,
+                    "recipient_type": "individual",
+                    "to": from_number,
+                    "type": "text",
+                    "text": {
+                        "body": prompt_text
+                    }
+                })
+                prompt_resp = requests.post(url, headers=headers, data=prompt_data)
+                print(prompt_resp.text)
+                print("response code for user input prompt:" + str(prompt_resp.status_code))
             except:
                 pass
 
