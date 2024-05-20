@@ -2,7 +2,9 @@ import os
 from flask import Flask, request, json
 import requests
 from dotenv import load_dotenv
-from msgs.send_list_msg import list_intent, welcome_message, job_role_list, payout_options_list, account_holder_name_prompt, send_text_message
+from msgs.send_list_msg import (
+    list_intent, welcome_message, job_role_list, payout_options_list, account_holder_name_prompt, send_text_message, receive
+)
 load_dotenv()
 
 app = Flask(__name__)
@@ -84,8 +86,7 @@ def handle_webhook():
                 pass
 
             try:
-                job_role_selected = \
-                request.json["entry"][0]["changes"][0]["value"]["messages"][0]["interactive"]["button_reply"]["title"]
+                job_role_selected = request.json["entry"][0]["changes"][0]["value"]["messages"][0]["interactive"]["button_reply"]["title"]
                 if job_role_selected:
                     # Prompt the user to type anything
                     prompt_text = f"You have selected {job_role_selected}. Please type anything to continue."
@@ -93,6 +94,17 @@ def handle_webhook():
                     prompt_resp = requests.post(url, headers=headers, data=prompt_payload)
                     print(prompt_resp.text)
                     print("response code for user input prompt:" + str(prompt_resp.status_code))
+            except:
+                pass
+
+            try:
+                user_input = request.json["entry"][0]["changes"][0]["value"]["messages"][0]["text"]["body"]
+                if user_input:
+                    # Respond with a thank you message
+                    thank_you_payload = receive(from_number, "Thank you, we got the response.")
+                    thank_you_resp = requests.post(url, headers=headers, data=thank_you_payload)
+                    print(thank_you_resp.text)
+                    print("response code for thank you message:" + str(thank_you_resp.status_code))
             except:
                 pass
 
@@ -121,6 +133,7 @@ def handle_webhook():
                     print("response code for UPI name prompt:" + str(upi_name_resp.status_code))
             except:
                 pass
+
     return ('', 200)
 
 @app.route("/")

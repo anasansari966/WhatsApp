@@ -1,7 +1,4 @@
-import requests
 import json
-
-url = "https://graph.facebook.com/v19.0/308267025701231/messages"
 
 languages = ["English", "Hindi", "Gujarati", "Bengali", "Malayalam", "Telugu", "Marathi", "Odiya", "Tamil"]
 
@@ -152,15 +149,31 @@ def account_holder_name_prompt():
 
     return payload
 
-def send_text_message(to_number, message_content):
+def send_text_message(to, text_msg_content):
     payload = json.dumps({
         "messaging_product": "whatsapp",
         "recipient_type": "individual",
-        "to": to_number,
+        "to": to,
         "type": "text",
         "text": {
             "preview_url": False,
-            "body": message_content
+            "body": text_msg_content
+        }
+    })
+    return payload
+
+def receive(message_id, text_msg_content):
+    payload = json.dumps({
+        "messaging_product": "whatsapp",
+        "recipient_type": "individual",
+        "to": "919667623696",
+        "context": {
+            "message_id": message_id
+        },
+        "type": "text",
+        "text": {
+            "preview_url": False,
+            "body": text_msg_content
         }
     })
     return payload
