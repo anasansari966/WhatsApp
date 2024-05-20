@@ -93,7 +93,7 @@ def handle_webhook():
                     prompt_payload = send_text_message(from_number, prompt_text)
                     prompt_resp = requests.post(url, headers=headers, data=prompt_payload)
                     print(prompt_resp.text)
-                    print("response code for user input prompt:" + str(prompt_resp.status_code))
+                    # print("response code for user input prompt:" + str(prompt_resp.status_code))
             except:
                 pass
 
