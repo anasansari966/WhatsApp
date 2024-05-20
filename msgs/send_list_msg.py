@@ -152,19 +152,15 @@ def account_holder_name_prompt():
 
     return payload
 
-def receive_input(recipient, message_id, text_content):
+def send_text_message(to_number, message_content):
     payload = json.dumps({
         "messaging_product": "whatsapp",
         "recipient_type": "individual",
-        "to": recipient,
-        "context": {
-            "message_id": message_id
-        },
+        "to": to_number,
         "type": "text",
         "text": {
             "preview_url": False,
-            "body": text_content
+            "body": message_content
         }
     })
-
     return payload
