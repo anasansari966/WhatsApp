@@ -1,11 +1,7 @@
-import requests
 import json
 
-url = "https://graph.facebook.com/v19.0/308267025701231/messages"
-
-languages = ["English", "Hindi", "Gujarati", "Bengali", "Malayalam", "Telugu", "Marathi", "Odiya", "Tamil"]
-
 def list_intent():
+    languages = ["English", "Hindi", "Gujarati", "Bengali", "Malayalam", "Telugu", "Marathi", "Odiya", "Tamil"]
     payload = json.dumps({
         "messaging_product": "whatsapp",
         "recipient_type": "individual",
@@ -150,4 +146,20 @@ def account_holder_name_prompt():
         }
     })
 
+    return payload
+
+def receive(text_message, to_number, message_id):
+    payload = json.dumps({
+        "messaging_product": "whatsapp",
+        "recipient_type": "individual",
+        "to": to_number,
+        "context": {
+            "message_id": message_id
+        },
+        "type": "text",
+        "text": {
+            "preview_url": False,
+            "body": text_message
+        }
+    })
     return payload

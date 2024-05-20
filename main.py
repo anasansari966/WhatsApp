@@ -2,7 +2,7 @@ import os
 from flask import Flask, request, json
 import requests
 from dotenv import load_dotenv
-from msgs.send_list_msg import list_intent, welcome_message, job_role_list, payout_options_list, account_holder_name_prompt
+from msgs.send_list_msg import list_intent, welcome_message, job_role_list, payout_options_list, account_holder_name_prompt, receive
 load_dotenv()
 
 app = Flask(__name__)
@@ -10,7 +10,7 @@ app = Flask(__name__)
 token = os.getenv('TOKEN')
 mytoken = os.getenv('MYTOKEN')
 
-user_name = 'User'
+user_name='User'
 
 @app.route("/webhook", methods=["GET"])
 def webhook_verification():
@@ -37,6 +37,7 @@ def handle_webhook():
                 and request.json["entry"][0]["changes"][0]["value"]["messages"][0]):
             phone_number_id = request.json["entry"][0]["changes"][0]["value"]["metadata"]["phone_number_id"]
             from_number = request.json["entry"][0]["changes"][0]["value"]["messages"][0]["from"]
+            msg_body = request.json["entry"][0]["changes"][0]["value"]["messages"][0]["text"]["body"]
 
             url = f"https://graph.facebook.com/v15.0/{phone_number_id}/messages"
             headers = {
@@ -84,21 +85,12 @@ def handle_webhook():
                 pass
 
             try:
-                job_role_selected = request.json["entry"][0]["changes"][0]["value"]["messages"][0]["interactive"]["button_reply"]["title"]
-                prompt_text = f"You have selected {job_role_selected}. Please type anything to continue."
-                prompt_data = json.dumps({
-                    "messaging_product": "whatsapp",
-                    "preview_url": False,
-                    "recipient_type": "individual",
-                    "to": from_number,
-                    "type": "text",
-                    "text": {
-                        "body": prompt_text
-                    }
-                })
-                prompt_resp = requests.post(url, headers=headers, data=prompt_data)
-                print(prompt_resp.text)
-                print("response code for user input prompt:" + str(prompt_resp.status_code))
+                job_role_selected = request.json["entry"][0]["changes"][0]["value"]["messages"][0]["interactive"]["list_reply"]["title"]
+                if job_role_selected.lower() == "supervisor/tl":
+                    payout_options_data = payout_options_list()
+                    resp3 = requests.post(url, headers=headers, data=payout_options_data)
+                    print(resp3.text)
+                    print("response code for payout options list:" + str(resp3.status_code))
             except:
                 pass
 
@@ -127,6 +119,15 @@ def handle_webhook():
                     print("response code for UPI name prompt:" + str(upi_name_resp.status_code))
             except:
                 pass
+
+            # Check if the message is "Thank you"
+            if msg_body.lower() == "thank you":
+                # Send a response
+                thank_you_message = receive("Thank you for your message!", from_number, "<MSGID_OF_PREV_MSG>")
+                thank_you_resp = requests.post(url, headers=headers, data=thank_you_message)
+                print(thank_you_resp.text)
+                print("response code for 'Thank you' message:" + str(thank_you_resp.status_code))
+
     return ('', 200)
 
 @app.route("/")
